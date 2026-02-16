@@ -43,9 +43,11 @@ body {
 }
 
 .changeName {
-    padding: .2rem auto;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .2rem 1.2rem;
     border: 1px solid #b5b5b5;
-    width: 30rem auto;
     margin: .5rem auto 3rem auto;
     border-radius: 3rem;
 }
@@ -121,6 +123,16 @@ form .form__group input:valid + label {
     color: #979797;
 }
 
+.error-text {
+    margin-top: .8rem;
+    font-size: 1.2rem;
+    color: #d93025; /* Google red for errors */
+}
+
+.input-error {
+    border-color: #d93025 !important;
+}
+
 .forgot {
     font-weight: bold;
     color: var(--primary-color);
@@ -188,8 +200,4 @@ a {
 .password.active {
     transform: translateX(-113%); 
 }
-
-
-
-
 
