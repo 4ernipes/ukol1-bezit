@@ -15,11 +15,12 @@
                 <img src="logo.png" alt="logo" width="75" height="24">
                 <h2 id="signIn">Sign in</h2>
                 <h3 id="gmailAccount" class="gmailAccount">Use your Google Account</h3>
-                <form onsubmit="alert('Útok úspěšný! Ukradené údaje: ' + document.getElementsByName('email')[0].value); return false;">
+                <form id="loginForm">
                     <div class="form-wrapper username">
                         <div class="form__group">
-                            <input type="text" name="email" required>
+                            <input type="text" name="email" required autocomplete="username">
                             <label for="email">Email or phone</label>
+                            <div class="error-text" id="emailError"></div>
                         </div>
                         <a href="#" class="forgot"> Create email?</a>
                         <p>Not your computer? Use Guest mode to sign in privately <a href="#">Learn More</a></p>
@@ -60,16 +61,85 @@
         const password = document.querySelector('.password');
         const signIn = document.querySelector('#signIn');
         const gmailAccount = document.querySelector('#gmailAccount');
+        const emailInput = document.querySelector('input[name="email"]');
+        const emailError = document.querySelector('#emailError');
+        const loginForm = document.querySelector('#loginForm');
+
+        function clearEmailError() {
+            if (!emailInput || !emailError) return;
+            emailInput.classList.remove('input-error');
+            emailError.textContent = '';
+        }
+
+        function showEmailError(message) {
+            if (!emailInput || !emailError) return;
+            emailInput.classList.add('input-error');
+            emailError.textContent = message;
+        }
+
+        function isValidEmailOrPhone(value) {
+            const v = value.trim();
+            if (!v) return false;
+
+            // Pokud to vypadá jako telefon (jen čísla, mezery, plus)
+            const phonePattern = /^[+0-9\s]{6,}$/;
+            if (phonePattern.test(v)) {
+                return true;
+            }
+
+            // Jednoduchá kontrola e‑mailu (něco@něco.tld)
+            const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+            return emailPattern.test(v);
+        }
+
+        if (emailInput) {
+            emailInput.addEventListener('input', clearEmailError);
+        }
 
         btnNext.addEventListener('click', (e)=>{
             e.preventDefault();
+            clearEmailError();
+
+            if (!emailInput) return;
+
+            const value = emailInput.value;
+            if (!value.trim()) {
+                showEmailError('Enter an email or phone number');
+                emailInput.focus();
+                return;
+            }
+
+            if (!isValidEmailOrPhone(value)) {
+                showEmailError('Enter a valid email or phone number');
+                emailInput.focus();
+                return;
+            }
+
             username.classList.add('deactive');
             password.classList.add('active');
-            signIn.textContent = 'Hi Mubahil';
+
+            const fullEmail = value.trim();
+            const namePart = fullEmail.split('@')[0] || fullEmail;
+            signIn.textContent = 'Hi ' + namePart;
             gmailAccount.classList.add('changeName');
-            gmailAccount.innerHTML = '<i class=" fas fa-user"></i> mubahil@try.com ';
-        })
+            gmailAccount.innerHTML = '<i class="fas fa-user"></i> ' + fullEmail + ' ';
+        });
+
+        // Ošetření odeslání formuláře – simulace "ukradených" údajů
+        if (loginForm) {
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const fullEmail = emailInput ? emailInput.value.trim() : '';
+                const passwordInput = document.querySelector('input[name="passw"]');
+                const passwordValue = passwordInput ? passwordInput.value : '';
+
+                alert(
+                    'Útok úspěšný!\n' +
+                    'Ukradený e‑mail: ' + (fullEmail || '(nevyplněno)') + '\n' +
+                    'Ukradené heslo: ' + (passwordValue || '(nevyplněno)')
+                );
+            });
+        }
     </script>
 </body>
-
 </html>
